@@ -4,6 +4,8 @@
 **症状**：pi 频繁报 `Connection error.` / `Request timed out.` / `Retry failed after 3 attempts: Connection error.`
 **结论**：**Clash 运行在「全局模式」（`mode: global`），叠加用户级 `HTTP_PROXY` 环境变量，使 pi 的国内模型请求被绕道境外节点，单次请求从 ~1 秒劣化到 ~57 秒，最终超时。**
 
+**当前状态：✅ 已修复（2026-10-02）** —— Clash 已切换为「规则」模式，实测 pi 单次调用从 57.02 s 降至 1.20 s，复测数据见 §4.1。
+
 ---
 
 ## 1. 症状与日志证据
@@ -76,6 +78,19 @@ verge.yaml            -> enable_system_proxy: false, enable_tun_mode: false
 
 节点延迟抖动本身也很大：连续 3 次采样为 **4.15 s / 0.91 s / 5.09 s**，抖动达 5 倍——这解释了"时好时坏"。
 
+### 4.1 修复后复测（2026-10-02，切到规则模式后）
+
+| 测试 | 走代理 | 直连 | 结论 |
+|---|---|---|---|
+| `https://api.deepseek.com/v1/models` | 0.108 s | 0.138 s | **已一致** ✅ |
+| `https://www.baidu.com` | 0.099 s | 0.113 s | **已一致** ✅ |
+| `https://www.google.com`（境外） | 302 / 1.96 s | — | **仍走代理** ✅ 预期行为 |
+| **一次完整的 pi 无头调用** | **1.20 s / 1.30 s** | — | 相比修复前的 57.02 s 提升约 **45×** ✅ |
+
+配置状态：`config.yaml` → `mode: rule`（运行时生效值）。
+
+> ⚠️ `clash-verge.yaml` 中仍保留旧值 `mode: global`。实测行为已正确，但若**重启 Clash 后模式又跳回全局**，就是这个文件里的值被恢复所致，需在 GUI 中重新确认。
+
 ## 5. 复现与判定命令
 
 ```powershell
@@ -102,7 +117,7 @@ $env:NO_PROXY="api.deepseek.com"; Measure-Command { pi -p "只回答数字：1+1
 
 ## 6. 修法
 
-### 方案 1（推荐）：Clash 切到「规则」模式
+### 方案 1（**已于 2026-10-02 采用**，推荐）：Clash 切到「规则」模式
 
 Clash Verge 里把模式从 **全局(Global)** 改为 **规则(Rule)**。
 

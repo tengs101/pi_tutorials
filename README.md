@@ -144,12 +144,14 @@ pi config         # 可选：TUI 里按需启用/禁用包提供的资源（Tab 
 
 以下都是在本机实际踩到并已确诊的问题，**换机器前请先核对是否适用**：
 
-| 现象 | 根因 | 处理 |
+| 现象 | 根因 | 状态与处理 |
 |---|---|---|
-| pi 频繁 `Connection error.` / `Request timed out.`，单次调用从 ~1s 劣化到 **57s** | Clash 处于**全局模式** + 用户级 `HTTP_PROXY/HTTPS_PROXY` 环境变量，使国内模型请求被绕道境外节点 | 切到「规则」模式，或给国内域名设 `NO_PROXY` → 详见 [诊断报告](docs/clash全局模式导致pi连接超时-诊断报告.md) |
-| 命令行访问国内站点返回 **412**，浏览器却正常 | 同上：共享代理出口 IP 被风控；浏览器因系统代理关闭而直连 | 同上 |
-| 本地语音转写很慢（约 2.1× 实时） | 本机**无独立 GPU**，`faster-whisper` 自动退回 **CPU + int8 + small** 模型 | 属设计行为；不要显式指定 `--cpu-threads` → 详见 [bilibili-persona 文档](docs/bilibili-persona-安装与踩坑.md) |
-| 可用内存紧张（约 3 GB） | 长音频转写需注意不要与其他重任务并行 | 串行处理 |
+| pi 频繁 `Connection error.` / `Request timed out.`，单次调用从 ~1s 劣化到 **57s** | Clash 处于**全局模式** + 用户级 `HTTP_PROXY/HTTPS_PROXY` 环境变量，使国内模型请求被绕道境外节点 | ✅ **已解决（2026-10-02）**：Clash 已切到「规则」模式，实测 pi 单次调用 **57.02s → 1.20s** → 详见 [诊断报告](docs/clash全局模式导致pi连接超时-诊断报告.md) |
+| 命令行访问国内站点返回 **412**，浏览器却正常 | 同上：共享代理出口 IP 被风控；浏览器因系统代理关闭而直连 | ✅ **已解决**：随上一项一并消失（实测国内域名走代理与直连耗时已一致：DeepSeek 0.108s vs 0.138s） |
+| 本地语音转写很慢（约 2.1× 实时） | 本机**无独立 GPU**，`faster-whisper` 自动退回 **CPU + int8 + small** 模型 | ⚙️ 设计行为，无需修复；不要显式指定 `--cpu-threads` → 详见 [bilibili-persona 文档](docs/bilibili-persona-安装与踩坑.md) |
+| 可用内存紧张（约 3 GB） | 长音频转写需注意不要与其他重任务并行 | ⚠️ 注意事项：串行处理 |
+
+> 前两项的修复方式：把 Clash Verge 的模式从「全局」改为「规则」。若重启 Clash 后模式被恢复为全局，需在 GUI 中重新确认（`clash-verge.yaml` 里仍留有 `mode: global` 的旧值）。
 
 ---
 
