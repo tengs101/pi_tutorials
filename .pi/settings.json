@@ -1,0 +1,52 @@
+{
+  "packages": [
+    {
+      "source": "npm:pi-open-tui",
+      "autoload": false,
+      "extensions": [
+        "+extensions\\open-tui\\index.ts"
+      ]
+    },
+    {
+      "source": "npm:pi-subagents",
+      "autoload": false,
+      "extensions": [
+        "+index.ts"
+      ],
+      "skills": [
+        "+skills\\pi-subagents\\SKILL.md"
+      ],
+      "prompts": [
+        "+prompts\\gather-context-and-clarify.md",
+        "+prompts\\parallel-cleanup.md",
+        "+prompts\\parallel-context-build.md",
+        "+prompts\\parallel-handoff-plan.md",
+        "+prompts\\parallel-research.md",
+        "+prompts\\parallel-review.md",
+        "+prompts\\review-loop.md"
+      ]
+    },
+    {
+      "source": "npm:pi-web-access",
+      "autoload": false,
+      "extensions": [
+        "+dist\\index.js"
+      ]
+    }
+  ],
+  "themes": [],
+  "skills": [
+    "C:\\Users\\tengs\\.pi\\agent\\skills\\chrome-devtools\\SKILL.md",
+    "+C:\\Users\\tengs\\.pi\\agent\\skills\\chrome-devtools\\SKILL.md",
+    "C:\\Users\\tengs\\.pi\\agent\\skills\\chrome-devtools-cli\\SKILL.md",
+    "+C:\\Users\\tengs\\.pi\\agent\\skills\\chrome-devtools-cli\\SKILL.md"
+  ],
+  "extensions": [
+    "C:\\Users\\tengs\\.pi\\agent\\extensions\\copy-no-newline.ts",
+    "+C:\\Users\\tengs\\.pi\\agent\\extensions\\copy-no-newline.ts",
+    "+builtin:codemode",
+    "+builtin:llama.cpp",
+    "+builtin:mcp",
+    "+builtin:tool-search"
+  ]
+}
